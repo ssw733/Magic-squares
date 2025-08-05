@@ -12,3 +12,6 @@ Symmetric checks for:<br/>
 Using:<br/>
 -Set in the source file the dimension of the calculated square<br/>
 -Run it
+
+4x4 squares perfomance
+<img width="489" height="292" alt="image" src="https://github.com/user-attachments/assets/3782b89f-f1f1-4a2a-96d5-77a765c4ce36" />
