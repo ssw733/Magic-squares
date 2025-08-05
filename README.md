@@ -4,11 +4,11 @@ This is my training project on Go, the algorithm uses the possibilities of produ
 
 This is a light version (without BigInt), and it does not support squares with a dimension of more than 7
 
-Symmetric checks for:
--horizontals
--verticals
+Symmetric checks for:<br/>
+-horizontals<br/>
+-verticals<br/>
 -diagonals
 
-Using:
--Set in the source file the dimension of the calculated square
+Using:<br/>
+-Set in the source file the dimension of the calculated square<br/>
 -Run it
