@@ -13,6 +13,7 @@ Using:<br/>
 -Set in the source file the dimension of the calculated square<br/>
 -Run it
 
+2x CPU Xeon 2689 v2, 2.6 MHz (20core/40threads)
 3x3 squares perfomance<br/>
 <img width="317" height="170" alt="image" src="https://github.com/user-attachments/assets/3199f8dd-3298-403e-bfcc-5d7a6b5e24c4" />
 
