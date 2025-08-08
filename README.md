@@ -14,7 +14,9 @@ Using:<br/>
 -Run it
 
 3x3 squares perfomance<br/>
-<img width="551" height="313" alt="image" src="https://github.com/user-attachments/assets/424b7780-a92a-45bd-8497-88a6848f6e90" />
+<img width="317" height="170" alt="image" src="https://github.com/user-attachments/assets/3199f8dd-3298-403e-bfcc-5d7a6b5e24c4" />
+
 
 4x4 squares perfomance<br/>
-<img width="489" height="292" alt="image" src="https://github.com/user-attachments/assets/3782b89f-f1f1-4a2a-96d5-77a765c4ce36" />
+<img width="425" height="132" alt="image" src="https://github.com/user-attachments/assets/a4fe7422-c881-48ac-a482-9e5c8282bc06" />
+
