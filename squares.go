@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-const dimension int = 3
+const dimension int = 4
 
 const routineDepth int = 2
 
@@ -70,10 +70,6 @@ func findRows(row [dimension]int, pos int) {
 				findRows(row2, pos+1)
 			}
 			if pos == dimension-1 && checkRow(row2) {
-				multiple := 1
-				for _, v := range row2 {
-					multiple *= v
-				}
 				rowPseudonim := findRowPseudonim(row2)
 				Mutex.Lock()
 				MagicRows[rowPseudonim] = append(MagicRows[rowPseudonim], row2)
