@@ -3,16 +3,20 @@ package main
 import (
 	"fmt"
 	"math"
+	"sort"
 	"sync"
 	"time"
 )
 
 const dimension int = 3
 
+const routineDepth int = 2
+
 // Maximum number of square
 const max int = dimension * dimension
 
-var MagicConst int
+// Magic const and Counter of valid magic squares
+var MagicConst, SquaresCounter int
 
 // Array of numbers of square
 var GenesisNumbers = [max]int{}
@@ -20,11 +24,11 @@ var GenesisNumbers = [max]int{}
 // Number of permutations of the original numbers of the square
 var Factorial int = 1
 
-// Counter of valid magic squares
-var SquaresCounter int
-var CounterMutex sync.Mutex
-var PrinterMutex sync.Mutex
+var MagicRows map[[dimension]int][][dimension]int
+var HarmonicMagicRowsKeys [][dimension]int
+var Mutex sync.Mutex
 var Wg sync.WaitGroup
+var Lol int
 
 func init() {
 	for i := range max {
@@ -33,6 +37,7 @@ func init() {
 		Factorial *= i + 1
 	}
 	MagicConst /= dimension
+	MagicRows = make(map[[dimension]int][][dimension]int)
 	fmt.Println("Dimension of square is", dimension)
 	fmt.Println("Magic const is", MagicConst)
 	fmt.Println("Factorial is", Factorial, "permutations")
@@ -42,39 +47,111 @@ func init() {
 
 func main() {
 	start := time.Now()
-	shuffleNumbers(GenesisNumbers, 0)
+	findRows([dimension]int{}, 0)
+	Wg.Add(1)
+	go func() {
+		defer Wg.Done()
+		findHarmonicRows([max]int{}, 0)
+	}()
 	Wg.Wait()
 	fmt.Println("Total:", SquaresCounter, "squares")
 	fmt.Println("Runtime is", time.Since(start))
 }
 
-func shuffleNumbers(square [max]int, pos int) {
-	//pre validation of rows of sqaures
-	if pos > 0 && pos%dimension == 0 {
-		col := [dimension]int(square[pos-dimension : pos])
-		if !checkRow(col) {
-			return
+func findRows(row [dimension]int, pos int) {
+	for i := 0; i < max; i++ {
+		if !inRow(row, i+1) {
+			var row2 [dimension]int
+			row2 = row
+			if pos < dimension {
+				row2[pos] = i + 1
+			}
+			if pos < dimension-1 {
+				findRows(row2, pos+1)
+			}
+			if pos == dimension-1 && checkRow(row2) {
+				multiple := 1
+				for _, v := range row2 {
+					multiple *= v
+				}
+				rowPseudonim := findRowPseudonim(row2)
+				Mutex.Lock()
+				MagicRows[rowPseudonim] = append(MagicRows[rowPseudonim], row2)
+				Mutex.Unlock()
+			}
 		}
 	}
-	//main loop
-	for i := pos; i < max; i++ {
+}
+
+func findHarmonicRows(square [max]int, pos int) {
+	for key, _ := range MagicRows {
+		if pos == 0 || pos > 0 && !numbersOfRowInSquare(square, key, pos*dimension) {
+			var square2 [max]int
+			square2 = square
+			if pos < dimension {
+				for k, v := range key {
+					square2[dimension*pos+k] = v
+				}
+			}
+			if pos <= routineDepth {
+				Wg.Add(1)
+				go func() {
+					defer Wg.Done()
+					findHarmonicRows(square2, pos+1)
+				}()
+			} else if pos < dimension-1 {
+				findHarmonicRows(square2, pos+1)
+			}
+			if pos == dimension-1 {
+				shuffleRows([max]int{}, square2, 0)
+			}
+		}
+	}
+}
+
+func shuffleRows(square [max]int, squarePattern [max]int, pos int) {
+	var key [dimension]int
+	for i := 0; i < dimension; i++ {
+		key[i] = squarePattern[pos*dimension+i]
+	}
+	for _, row := range MagicRows[key] {
 		var square2 [max]int
 		square2 = square
-		square2[i], square2[pos] = square2[pos], square2[i]
-		if pos == 0 {
-			Wg.Add(1)
-			go func() {
-				defer Wg.Done()
-				shuffleNumbers(square2, pos+1)
-			}()
-		} else {
-			shuffleNumbers(square2, pos+1)
+		for i, n := range row {
+			square2[pos*dimension+i] = n
+		}
+		if pos < dimension-1 {
+			shuffleRows(square2, squarePattern, pos+1)
+		} else if pos == dimension-1 && checkSquare(square2) {
+			printSquare(square2)
 		}
 	}
-	//check calculated squares
-	if pos == max-1 && checkSquare(square) {
-		printSquare(square)
+}
+
+func findRowPseudonim(row [dimension]int) [dimension]int {
+	sort.Ints(row[:])
+	return row
+}
+
+func numbersOfRowInSquare(square [max]int, row [dimension]int, pos int) bool {
+	for i := 0; i < pos; i++ {
+		for _, v := range row {
+			if square[i] == v {
+				return true
+			}
+		}
+
 	}
+	return false
+}
+
+func inRow(row [dimension]int, number int) bool {
+	for _, v := range row {
+		if v == number {
+			return true
+		}
+	}
+	return false
 }
 
 func checkRow(col [dimension]int) bool {
@@ -110,14 +187,21 @@ func checkSquare(square [max]int) bool {
 	if mainDiagSum != MagicConst || antiDiagSum != MagicConst {
 		return false
 	}
-	CounterMutex.Lock()
+	for i1, v1 := range square {
+		for i2, v2 := range square {
+			if i1 != i2 && v1 == v2 {
+				return false
+			}
+		}
+	}
+	Mutex.Lock()
 	SquaresCounter++
-	CounterMutex.Unlock()
+	Mutex.Unlock()
 	return true
 }
 
 func printSquare(square [max]int) {
-	PrinterMutex.Lock()
+	Mutex.Lock()
 	magicSquare := [dimension][dimension]int{}
 	for k, num := range square {
 		magicSquare[int(math.Floor(float64(k))/float64(dimension))][k%dimension] = num
@@ -126,5 +210,6 @@ func printSquare(square [max]int) {
 		fmt.Println(line)
 	}
 	fmt.Println("-----")
-	PrinterMutex.Unlock()
+	//fmt.Print(strings.Trim(fmt.Sprint(square), "[]") + "\n")
+	Mutex.Unlock()
 }
