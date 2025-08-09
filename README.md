@@ -24,4 +24,5 @@ Using:<br/>
 squares_old contains a version of the original number permutation algorithm that has poor performance
 
 "draw" directory includes 4x4 squares in SVG images
-<img width="480" height="480" alt="image" src="https://github.com/user-attachments/assets/4ec0e6b6-e9dd-4d9b-b30f-38af0db7b863" />
+
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/4ec0e6b6-e9dd-4d9b-b30f-38af0db7b863" />
