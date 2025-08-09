@@ -21,4 +21,4 @@ Using:<br/>
 4x4 squares perfomance<br/>
 <img width="425" height="132" alt="image" src="https://github.com/user-attachments/assets/a4fe7422-c881-48ac-a482-9e5c8282bc06" />
 
-squares_old contains a version of the original number permutation algorithm that has poor performance on squares >= 5
+squares_old contains a version of the original number permutation algorithm that has poor performance
